@@ -1,0 +1,4 @@
+[
+  {"id": 101, "name": "Rohan", "orders": [{"item": "Laptop", "qty": 1}]},
+  {"id": 102, "name": "Anita", "orders": [{"item": "Mouse", "qty": 2}, {"item": "Pen", "qty": 5}]}
+]

@@ -18,3 +18,11 @@ def test_generated_dml_includes_values_for_surrogate_primary_key():
     schema, table_data = normalize("people", CsvParser().parse(FIXTURES / "no_primary_key.csv"))
     _, values = generate_dml(schema, table_data)["people"]
     assert values[0][0] == 1
+
+
+def test_mysql_dml_uses_mysql_placeholders_and_identifier_quotes():
+    schema, table_data = normalize("order", CsvParser().parse(FIXTURES / "reserved_words.csv"))
+    ddl = "\n".join(generate_ddl(schema, dialect="mysql"))
+    statement, _ = generate_dml(schema, table_data, dialect="mysql")["order"]
+    assert "`order`" in ddl
+    assert "%s" in statement

@@ -1,5 +1,6 @@
 import sqlite3
 from pathlib import Path
+from uuid import uuid4
 
 from database.db_loader import load
 from engine.normalization_engine import normalize
@@ -9,10 +10,18 @@ from parsers.json_parser import JsonParser
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
-def test_loader_creates_and_populates_linked_tables(tmp_path):
+def test_loader_creates_and_populates_linked_tables():
     schema, table_data = normalize("students", JsonParser().parse(FIXTURES / "nested_orders.json"))
-    db_path = tmp_path / "converted.db"
-    load(schema, table_data, generate_ddl(schema), generate_dml(schema, table_data), db_path)
-    with sqlite3.connect(db_path) as connection:
-        assert connection.execute("SELECT COUNT(*) FROM students").fetchone()[0] == 2
-        assert connection.execute("SELECT COUNT(*) FROM students_orders").fetchone()[0] == 3
+    output_dir = Path(__file__).parent / ".test-output"
+    output_dir.mkdir(exist_ok=True)
+    db_path = output_dir / f"{uuid4().hex}.db"
+    try:
+        load(schema, table_data, generate_ddl(schema), generate_dml(schema, table_data), db_path)
+        connection = sqlite3.connect(db_path)
+        try:
+            assert connection.execute("SELECT COUNT(*) FROM students").fetchone()[0] == 2
+            assert connection.execute("SELECT COUNT(*) FROM students_orders").fetchone()[0] == 3
+        finally:
+            connection.close()
+    finally:
+        db_path.unlink(missing_ok=True)

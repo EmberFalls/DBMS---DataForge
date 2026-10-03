@@ -1,3 +1,20 @@
+# DataForge — MySQL usage
+
+The implemented converter targets an existing MySQL database; it does not create a SQLite
+`.db` file. Install dependencies, then run from the repository root:
+
+```powershell
+& ".\.venv\bin\python.exe" ".\converter\main.py" ".\converter\tests\fixtures\nested_orders.json" --table-name students --database dataforge --host localhost --port 3306 --user root
+```
+
+The program prompts for the MySQL password, creates the inferred tables in `dataforge`,
+and inserts the converted rows. Run `pytest converter/tests -v -p no:cacheprovider` to
+check the automated suite. If a table already exists, use a different table or database
+name, or remove the old table before importing again.
+
+The implementation guide below is retained as the original project specification. The
+current database target has been changed from its original SQLite example to MySQL.
+
 # Multi-Format to SQL Converter — Implementation Guide
 
 This document is a build spec. It describes exactly what to build, in what order, using what

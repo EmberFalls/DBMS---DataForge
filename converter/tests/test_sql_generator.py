@@ -10,8 +10,8 @@ FIXTURES = Path(__file__).parent / "fixtures"
 def test_reserved_words_are_quoted_in_ddl():
     schema, _ = normalize("t", CsvParser().parse(FIXTURES / "reserved_words.csv"))
     combined = "\n".join(generate_ddl(schema))
-    assert '"order"' in combined
-    assert '"group"' in combined
+    assert "`order`" in combined
+    assert "`group`" in combined
 
 
 def test_generated_dml_includes_values_for_surrogate_primary_key():
@@ -22,7 +22,7 @@ def test_generated_dml_includes_values_for_surrogate_primary_key():
 
 def test_mysql_dml_uses_mysql_placeholders_and_identifier_quotes():
     schema, table_data = normalize("order", CsvParser().parse(FIXTURES / "reserved_words.csv"))
-    ddl = "\n".join(generate_ddl(schema, dialect="mysql"))
-    statement, _ = generate_dml(schema, table_data, dialect="mysql")["order"]
+    ddl = "\n".join(generate_ddl(schema))
+    statement, _ = generate_dml(schema, table_data)["order"]
     assert "`order`" in ddl
     assert "%s" in statement
